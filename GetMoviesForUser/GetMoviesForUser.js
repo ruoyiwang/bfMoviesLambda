@@ -1,12 +1,10 @@
 'use strict';
 
-// var AWS = require("aws-sdk");
 var elasticsearch = require('elasticsearch');
 var client = new elasticsearch.Client({
   host: 'search-bonfiremovies-fqthmtp6w4gfeypx2pm562oqxq.us-east-1.es.amazonaws.com',
   log: 'trace'
 });
-// const dynamo = new AWS.DynamoDB.DocumentClient();
 
 /**
  * Gets the list of imdb ids assocaited with a user id
@@ -38,25 +36,24 @@ exports.handler = (event, context, callback) => {
                         users: event.queryStringParameters.uid
                     }
                 };
-            };
+            }
 
             // conduct the search
             client.search({
-              index: 'usermovies',
-              type: 'movies',
-              body: {
-                query: q
-              }
+                index: 'usermovies',
+                type: 'movies',
+                body: {
+                  query: q
+                },
+                size: 500
             }).then(function (resp) {
                 var hits = resp.hits.hits;
                 var results = [];
                 for (var i = 0; i < hits.length; i++) {
                     results.push(hits[i]._source);
                 }
-                console.log(results);
                 done(null, results);
             }, function (err) {
-                console.trace(err.message);
                 done(err, null);
             });
 
